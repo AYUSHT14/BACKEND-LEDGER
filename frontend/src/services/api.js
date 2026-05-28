@@ -1,7 +1,15 @@
 import axios from 'axios';
 
+let baseUrl = import.meta.env.VITE_API_URL || 'https://backend-ledger-production.up.railway.app/api';
+
+// Normalize URL: trim trailing slash and append '/api' if it's not present
+baseUrl = baseUrl.trim();
+if (!baseUrl.endsWith('/api') && !baseUrl.endsWith('/api/')) {
+  baseUrl = baseUrl.replace(/\/$/, '') + '/api';
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://backend-ledger-production.up.railway.app/api',
+  baseURL: baseUrl,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
