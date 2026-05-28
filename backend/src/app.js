@@ -5,8 +5,38 @@ const accountRouter = require("./routes/account.routes")
 const app = express();
 const cookieParser = require("cookie-parser");
 // Middleware
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:3000"
+];
+
+if (process.env.FRONTEND_URL) {
+    const url = process.env.FRONTEND_URL.trim();
+    allowedOrigins.push(url);
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        allowedOrigins.push(`https://${url}`);
+        allowedOrigins.push(`http://${url}`);
+    } else {
+        const bareUrl = url.replace(/^https?:\/\//, '');
+        allowedOrigins.push(bareUrl);
+    }
+}
+
 app.use(cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true);
+        const normalizedOrigin = origin.replace(/\/$/, "").trim();
+        const isAllowed = allowedOrigins.some(allowed => {
+            const normalizedAllowed = allowed.trim().replace(/\/$/, "");
+            return normalizedOrigin === normalizedAllowed;
+        });
+        if (isAllowed) {
+            callback(null, true);
+        } else {
+            console.warn(`[CORS Warning] Origin "${origin}" blocked. Allowed origins are:`, allowedOrigins);
+            callback(null, false); // Block origin but do not crash the Node process
+        }
+    },
     credentials: true
 }));
 app.use(express.json());
