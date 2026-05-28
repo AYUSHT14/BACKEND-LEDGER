@@ -1,29 +1,67 @@
 const nodemailer = require('nodemailer');
- 
 
-//transporters connect to SMTP server to communicate and send emails
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    type: 'OAuth2',
-    user: process.env.EMAIL_USER,
-    clientId: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
-    refreshToken: process.env.REFRESH_TOKEN,
-  },
-});
+let transporter = null;
 
-// Verify the connection configuration
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('Error connecting to email server:', error);
+const gmailOAuthConfigured =
+  process.env.EMAIL_USER &&
+  process.env.CLIENT_ID &&
+  process.env.CLIENT_SECRET &&
+  process.env.REFRESH_TOKEN;
+
+const smtpLoginConfigured =
+  process.env.SMTP_HOST &&
+  process.env.EMAIL_USER &&
+  process.env.EMAIL_PASS;
+
+const isEmailConfigured = gmailOAuthConfigured || smtpLoginConfigured;
+
+if (isEmailConfigured) {
+  const transportOptions = {};
+
+  if (gmailOAuthConfigured) {
+    transportOptions.service = 'gmail';
+    transportOptions.auth = {
+      type: 'OAuth2',
+      user: process.env.EMAIL_USER,
+      clientId: process.env.CLIENT_ID,
+      clientSecret: process.env.CLIENT_SECRET,
+      refreshToken: process.env.REFRESH_TOKEN,
+    };
   } else {
-    console.log('Email server is ready to send messages');
+    transportOptions.host = process.env.SMTP_HOST;
+    transportOptions.port = parseInt(process.env.SMTP_PORT || '465', 10);
+    transportOptions.secure = process.env.SMTP_SECURE === 'true' || transportOptions.port === 465;
+    transportOptions.auth = {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    };
   }
-});
+
+  transporter = nodemailer.createTransport({
+    ...transportOptions,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
+  });
+
+  transporter.verify((error) => {
+    if (error) {
+      console.log('⚠️ Email service is offline. Backend will operate normally without email notifications.');
+      console.log('   Email error:', error.message || error);
+    } else {
+      console.log('✅ Email server is ready to send messages');
+    }
+  });
+} else {
+  console.log('ℹ️ Email notification service is inactive. Set EMAIL_USER and email credentials in env to enable it.');
+}
 
 // Function to send email
 const sendEmail = async (to, subject, text, html) => {
+  if (!transporter) {
+    console.log(`✉️ Simulated Email to <${to}>: "${subject}"`);
+    return;
+  }
   try {
     const info = await transporter.sendMail({
       from: `"Backend Ledger" <${process.env.EMAIL_USER}>`, // sender address
@@ -34,9 +72,8 @@ const sendEmail = async (to, subject, text, html) => {
     });
 
     console.log('Message sent: %s', info.messageId);
-    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Error sending email:', error.message || error);
   }
 };
 

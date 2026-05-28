@@ -127,14 +127,14 @@ This repo deploys as two services:
 1. In Railway, configure the backend service and set these variables:
    - `MONGO_URI`
    - `JWT_SECRET`
-   - `CLIENT_ID`
-   - `CLIENT_SECRET`
-   - `REFRESH_TOKEN`
-   - `EMAIL_USER`
    - `FRONTEND_URL=https://backend-ledger-kohl.vercel.app`
 
-2. Make sure the backend service is deployed to `backend` and that it starts successfully.
-3. Confirm the backend is reachable at:
+2. Email configuration (optional but recommended):
+   - For Gmail OAuth2: `CLIENT_ID`, `CLIENT_SECRET`, `REFRESH_TOKEN`, `EMAIL_USER`
+   - Or for generic SMTP: `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `EMAIL_USER`, `EMAIL_PASS`
+
+3. Make sure the backend service is deployed to `backend` and that it starts successfully.
+4. Confirm the backend is reachable at:
    - `https://backend-ledger-production.up.railway.app/api/auth`
    - `https://backend-ledger-production.up.railway.app/api/account`
    - `https://backend-ledger-production.up.railway.app/api/transaction`
