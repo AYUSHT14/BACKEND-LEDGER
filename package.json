@@ -1,6 +1,8 @@
 {
   "name": "backend-ledger-root",
   "version": "1.0.0",
+  "description": "NexaPay frontend + backend deployment repository (live demo on Vercel)",
+  "homepage": "https://backend-ledger-kohl.vercel.app",
   "scripts": {
     "build": "cd backend && npm install",
     "start": "cd backend && node server.js"
