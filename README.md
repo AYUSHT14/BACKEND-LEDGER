@@ -118,6 +118,44 @@ mongod --version
 
 ---
 
+## 🚀 Production Deployment
+This repo deploys as two services:
+- **Backend:** Railway (`https://backend-ledger-production.up.railway.app`)
+- **Frontend:** Vercel (`https://backend-ledger-kohl.vercel.app`)
+
+### Backend (Railway)
+1. In Railway, configure the backend service and set these variables:
+   - `MONGO_URI`
+   - `JWT_SECRET`
+   - `CLIENT_ID`
+   - `CLIENT_SECRET`
+   - `REFRESH_TOKEN`
+   - `EMAIL_USER`
+   - `FRONTEND_URL=https://backend-ledger-kohl.vercel.app`
+
+2. Make sure the backend service is deployed to `backend` and that it starts successfully.
+3. Confirm the backend is reachable at:
+   - `https://backend-ledger-production.up.railway.app/api/auth`
+   - `https://backend-ledger-production.up.railway.app/api/account`
+   - `https://backend-ledger-production.up.railway.app/api/transaction`
+
+### Frontend (Vercel)
+1. In Vercel, create/import the project from GitHub and point the root to `frontend`.
+2. Add this environment variable in Vercel:
+   - `VITE_API_URL=https://backend-ledger-production.up.railway.app/api`
+
+3. Deploy the Vercel project.
+4. Visit the Vercel URL and make sure the app loads correctly.
+
+### Important Notes
+- Your backend must allow CORS from the frontend domain, which is configured using `FRONTEND_URL` in Railway.
+- The frontend will use `VITE_API_URL` to call the Railway backend.
+- If you want the backend root URL to show a simple message, add a `GET /` route in `backend/src/app.js`.
+
+### Example `.env.example`
+- `backend/.env.example` contains the backend variables.
+- `frontend/.env.example` contains the frontend env variable.
+
 ## 🔌 API Reference
 
 ### 🔐 Authentication (`/api/auth`)
