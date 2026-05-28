@@ -20,6 +20,15 @@ app.use(cookieParser());
 
 const transactionRouter = require("./routes/transaction.routes");
 
+app.get("/", (req, res) => {
+    res.status(200).json({
+        status: "active",
+        message: "💎 NexaPay Ultra-Premium Banking API is live and healthy!",
+        version: "1.0.0",
+        database: "Connected"
+    });
+});
+
 app.use("/api/auth",authRouter);
 app.use("/api/account",accountRouter);
 app.use("/api/transaction",transactionRouter);
