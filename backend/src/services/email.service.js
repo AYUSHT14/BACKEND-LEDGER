@@ -50,25 +50,25 @@ async function sendRegistrationEmail(userEmail, name){
   `;
   await sendEmail(userEmail, subject, text, html);
 }
-async function sendTransactionEmail(fromUserEmail, toUserEmail, amount){
+async function sendTransactionEmail(userEmail, userName, amount, toAccount){
   const subject = `Transaction of ${amount} completed`;
-  const text = `Hi ${fromUserEmail} and ${toUserEmail},\n\nThank you for using Backend Ledger. Your transaction of ${amount} has been completed successfully.`;
+  const text = `Hi ${userName},\n\nThank you for using Backend Ledger. Your transaction of ${amount} to account ${toAccount} has been completed successfully.`;
   const html = `
     <h1>Transaction of ${amount} completed</h1>
-    <p>Hi ${fromUserEmail} and ${toUserEmail},</p>
-    <p>Thank you for using Backend Ledger. Your transaction of ${amount} has been completed successfully.</p>
+    <p>Hi ${userName},</p>
+    <p>Thank you for using Backend Ledger. Your transaction of ${amount} to account ${toAccount} has been completed successfully.</p>
   `;
-  await sendEmail(fromUserEmail, toUserEmail, subject, text, html);
+  await sendEmail(userEmail, subject, text, html);
 }
-async function sendTransactionFailedEmail(fromUserEmail, toUserEmail, amount){
+async function sendTransactionFailedEmail(userEmail, userName, amount, toAccount){
   const subject = `Transaction of ${amount} failed`;
-  const text = `Hi ${fromUserEmail} and ${toUserEmail},\n\nThank you for using Backend Ledger. Your transaction of ${amount} has been failed.`;
+  const text = `Hi ${userName},\n\nThank you for using Backend Ledger. Your transaction of ${amount} to account ${toAccount} has failed.`;
   const html = `
     <h1>Transaction of ${amount} failed</h1>
-    <p>Hi ${fromUserEmail} and ${toUserEmail},</p>
-    <p>Thank you for using Backend Ledger. Your transaction of ${amount} has been failed.</p>
+    <p>Hi ${userName},</p>
+    <p>Thank you for using Backend Ledger. Your transaction of ${amount} to account ${toAccount} has failed.</p>
   `;
-  await sendEmail(fromUserEmail, toUserEmail, subject, text, html);
+  await sendEmail(userEmail, subject, text, html);
 }
 module.exports = {
     sendRegistrationEmail,

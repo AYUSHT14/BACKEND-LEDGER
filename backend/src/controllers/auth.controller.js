@@ -100,33 +100,48 @@ async function userLoginController(req,res){
  */
 async function userLogoutController(req, res) {
     try {
-        const token = req.cookies.token;
+        const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
         if (!token) {
-            return res.status(401).json({
-                message: "No token found",
-                status: "failed"
-            })
+            res.clearCookie("token");
+            return res.status(200).json({
+                message: "No token found, session cleared",
+                status: "success"
+            });
         }
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+
+        let decodedToken;
+        try {
+            decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        } catch (err) {
+            res.clearCookie("token");
+            return res.status(200).json({
+                message: "Session expired, logged out successfully",
+                status: "success"
+            });
+        }
+
         const isTokenBlacklisted = await tokenBlackListModel.findOne({
             token: token
-        })
+        });
         if (isTokenBlacklisted) {
-            return res.status(401).json({
-                message: "Token is already blacklisted",
-                status: "failed"
-            })
+            res.clearCookie("token");
+            return res.status(200).json({
+                message: "Already logged out",
+                status: "success"
+            });
         }
+
         const tokenBlacklist = await tokenBlackListModel.create({
             token: token
-        })
-        res.clearCookie("token")
+        });
+        res.clearCookie("token");
         return res.status(200).json({
             message: "User logged out successfully",
             status: "success",
             tokenBlacklist
-        })
+        });
     } catch (error) {
+        res.clearCookie("token");
         res.status(500).json({ message: error.message, status: "failed" });
     }
 }

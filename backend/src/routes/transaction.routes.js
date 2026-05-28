@@ -13,4 +13,12 @@ const transactionRoutes = Router();
 transactionRoutes.post("/",authMiddleware.authMiddleware, transactionController.createTransaction)
 transactionRoutes.post("/system/initial-fund",authMiddleware.authSystemMiddleware, transactionController.createInitialFundsTransaction)
 
-module.exports = transactionRoutes
+/**
+ * GET /api/transaction/
+ * Description: Get all transactions for the authenticated user
+ * Access: Private
+ * Response: { transactions, pagination, message, status }
+ */
+transactionRoutes.get("/",authMiddleware.authMiddleware, transactionController.getUserTransactionsController)
+
+module.exports = transactionRoutes
