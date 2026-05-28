@@ -1,8 +1,6 @@
 # 💎 NexaPay — Ultra-Premium Fintech & Double-Entry Ledger System
 
-Live demo:
-- [https://backend-ledger-kohl.vercel.app](https://backend-ledger-kohl.vercel.app)
-- [https://backend-ledger-mu.vercel.app](https://backend-ledger-mu.vercel.app) (requires aliasing in Vercel)
+Live demo: [https://backend-ledger-kohl.vercel.app](https://backend-ledger-kohl.vercel.app)
 
 NexaPay is a world-class, production-ready banking and double-entry ledger application. It features a handcrafted, ultra-premium fintech user interface inspired by elite products like **Stripe, Apple Card, and Linear**. 
 
