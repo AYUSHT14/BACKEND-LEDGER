@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-let baseUrl = import.meta.env.VITE_API_URL || 'https://backend-ledger-production.up.railway.app/api';
+let baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // Normalize URL: trim trailing slash and append '/api' if it's not present
 baseUrl = baseUrl.trim();

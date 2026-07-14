@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 function formatDate(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr);
@@ -51,6 +53,7 @@ const TX_META = {
 
 export default function TransactionItem({ transaction, userAccountIds = [], accounts = [], index = 0 }) {
   const { fromAccount, toAccount, amount, status, createdAt, _id } = transaction;
+  const [copiedId, setCopiedId] = useState('');
 
   const type    = getTxType(transaction, userAccountIds);
   const meta    = TX_META[type];
@@ -59,6 +62,28 @@ export default function TransactionItem({ transaction, userAccountIds = [], acco
 
   const fromId = String(fromAccount?._id || fromAccount || '');
   const toId   = String(toAccount?._id   || toAccount   || '');
+
+  const handleCopyAccountId = async (id) => {
+    if (!id) return;
+
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(id);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = id;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      setCopiedId(id);
+      window.setTimeout(() => setCopiedId(''), 1800);
+    } catch {}
+  };
 
   const getAccountLabel = (id) => {
     const acc = accounts.find((a) => String(a._id || a) === String(id));
@@ -70,11 +95,29 @@ export default function TransactionItem({ transaction, userAccountIds = [], acco
 
   // Sub-label: tell user exactly which account was involved
   let subLabel = '';
-  if (type === 'deposit')  subLabel = `To your ${getAccountLabel(toId)}`;
-  if (type === 'received') subLabel = `To your ${getAccountLabel(toId)} · From ${shortId(fromId)}`;
-  if (type === 'sent')     subLabel = `From your ${getAccountLabel(fromId)} · To ${shortId(toId)}`;
-  if (type === 'internal') subLabel = `From ${getAccountLabel(fromId)} → ${getAccountLabel(toId)}`;
+  let copyTargetId = '';
+  let copyLabel = 'Copy account ID';
 
+  if (type === 'deposit') {
+    subLabel = `To your ${getAccountLabel(toId)}`;
+    copyTargetId = toId;
+    copyLabel = 'Copy account ID';
+  }
+  if (type === 'received') {
+    subLabel = `To your ${getAccountLabel(toId)} · From ${shortId(fromId)}`;
+    copyTargetId = fromId;
+    copyLabel = 'Copy sender ID';
+  }
+  if (type === 'sent') {
+    subLabel = `From your ${getAccountLabel(fromId)} · To ${shortId(toId)}`;
+    copyTargetId = toId;
+    copyLabel = 'Copy recipient ID';
+  }
+  if (type === 'internal') {
+    subLabel = `From ${getAccountLabel(fromId)} → ${getAccountLabel(toId)}`;
+    copyTargetId = toId;
+    copyLabel = 'Copy account ID';
+  }
 
   const amtClass = status === 'PENDING' ? 'pending' : meta.amtClass;
 
@@ -88,6 +131,25 @@ export default function TransactionItem({ transaction, userAccountIds = [], acco
         <div className="transaction-title">{meta.label}</div>
         <div className="transaction-id" style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{subLabel}</div>
         <div className="transaction-id" style={{ marginTop: '2px' }}>TXN #{txShort}</div>
+        {copyTargetId && (
+          <button
+            type="button"
+            onClick={() => handleCopyAccountId(copyTargetId)}
+            style={{
+              marginTop: '6px',
+              padding: '4px 8px',
+              borderRadius: '999px',
+              border: '1px solid var(--glass-border)',
+              background: 'var(--glass-bg)',
+              color: 'var(--text-secondary)',
+              fontSize: '11px',
+              cursor: 'pointer',
+              width: 'fit-content'
+            }}
+          >
+            {copiedId === copyTargetId ? 'Copied' : copyLabel}
+          </button>
+        )}
       </div>
 
       {/* Date + Status */}
