@@ -13,6 +13,29 @@ NexaPay is a world-class, production-ready banking and double-entry ledger appli
 - **Premium Interface** — Handcrafted obsidian dark aesthetic with dynamic card filtering
 - **Secure Authentication** — JWT-based authentication with robust session isolation
 
+## 🔄 Application Flow
+
+```mermaid
+flowchart TD
+    A([User Signs Up / Logs In]) --> B{Dashboard}
+    B --> C[Create Bank Account <br> INR / USD / EUR]
+    B --> D[Deposit Funds <br> Simulate ATM deposit]
+    B --> E[Transfer Funds <br> Send money instantly]
+    
+    C --> F[(MongoDB)]
+    D --> G[Create Credit Ledger Entry]
+    E --> H[Create Debit & Credit <br> Ledger Entries]
+    
+    G --> I[(Double-Entry Ledger)]
+    H --> I
+    
+    I --> J[Compute Real-Time Balances]
+    I --> K[Display Transaction History]
+    
+    J --> B
+    K --> B
+```
+
 ## 🛠️ Tech Stack
 
 | Layer | Technology |
